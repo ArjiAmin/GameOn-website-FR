@@ -20,9 +20,44 @@ function launchModal() {
   modalbg.style.display = "block";
 }
 
-// close modal on “x”
+// Store the original form HTML
+const originalFormHtml = document.querySelector(".modal-body").innerHTML;
+
+function attachFormListeners() {
+  const form = document.querySelector("form[name='reserve']");
+  if (form) {
+    form.removeEventListener("submit", validate);
+    form.addEventListener("submit", validate);
+  }
+}
+
+// Reset and close modal, implemented : ESC to close, click on background or just the close buttons
+function resetAndCloseModal() {
+  const form = document.querySelector("form[name='reserve']");
+  if (form) form.reset();
+  document.querySelector(".modal-body").innerHTML = originalFormHtml;
+  modalbg.style.display = "none";
+  // This is necessary due to the way the reset is effectuated
+  attachFormListeners();
+}
+
+// close modal on "x"
 const closeBtn = document.querySelector(".close");
-closeBtn.addEventListener("click", () => modalbg.style.display = "none");
+closeBtn.addEventListener("click", resetAndCloseModal);
+
+// close on background click
+modalbg.addEventListener("click", (e) => {
+  if (e.target === modalbg) {
+    resetAndCloseModal();
+  }
+});
+
+// close on ESC key
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && modalbg.style.display === "block") {
+    resetAndCloseModal();
+  }
+});
 
 // catch submit
 const reserveForm = document.querySelector("form[name='reserve']");
@@ -136,8 +171,6 @@ function validate(e) {
 
     // Add event listener to the close button
     const closeButton = document.querySelector(".close-btn");
-    closeButton.addEventListener("click", function () {
-      modalbg.style.display = "none";
-    });
+    closeButton.addEventListener("click", resetAndCloseModal);
   }
 }
